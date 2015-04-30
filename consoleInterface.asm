@@ -115,4 +115,64 @@ console_clear: pushra
 		
 	return
 	
+# prints a signed integer to the console
+#PARAMETERS:
+# $a0 - the row to begin printing in
+# $a1 - the column to begin printing from
+# $a2 - the integer to print
+#DESTROYED:
+# $a0, $a1, $a2, $t0, $t6, $t7
+.globl console_printint
+console_printint: pushra
+	#first we need to find the character index we are printing to and store it in $a0
+	mul $a0, $a0, CONSOLE_CHARS_PER_ROW
+	add $a0, $a0, $a1
+	# $a0 is the memory offset in the character buffer that we are writing to
+	
+	bgez $a2, console_printint_notnegative
+	li $t0, 45
+	sb $t0, CONSOLE($a0)
+	addi $a0, $a0, 1
+	neg $a2, $a2
+	
+	console_printint_notnegative:
+	li $t7, 0 # $t7 will be set to something other than 0 once we actually print something
+	li $t6, 1000000000 #this is the number we will use to divide the input number
+	
+	console_printint_loop:
+	beqz $t6, console_printint_return
+	
+	div $a2, $t6
+	mflo $t0 # $t0 is the quotient
+	mfhi $a2 
+	
+	beqz $t0, console_printint_quotientiszero
+	
+	li $t7, 1
+	
+	
+	console_printint_print:
+	addi $t0, $t0, 48 #make the int into a char
+	sb $t0, CONSOLE($a0)
+	addi $a0, $a0, 1
+	div $t6, $t6, 10
+	j console_printint_loop
+	
+	console_printint_quotientiszero:
+		bnez $t7, console_printint_print
+		div $t6, $t6, 10
+		j console_printint_loop
+	
+console_printint_return: 
+	bnez $t7, console_printint_actualreturn
+	li $t0, 48
+	sb $t0, CONSOLE($a0)
+	
+console_printint_actualreturn: return	
+	
+	
+	
+	
+	
+	
 	
