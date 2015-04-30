@@ -20,26 +20,35 @@ main:
 	li $a0, 1
 	syscall
 	
+	li $a0, 0
+	li $a1, 10
+	li $a2, 10
 	j generatemap
 	
 # Fill the map with monsters
-generatemap:
+generatemap: #(a0 the position of player, a1 the number of wumpus, a2 the number of pits)
 	
 	# s0 is the map's address
 	la $s0, map
 	
+	add $s4, $0, $a0
+	add $s5, $0, $a1
+	add $s6, $0, $a2
+	
 	# place player in room 0
-	li $t1, 4
-	sw $t1, ($s0)
+	li $t2, 4
+	mul $t1, $s4, 4
+	add $t1, $t1, $s0
+	sw $t2, ($t1)
 	
 	# create 10 wumpus
 	li $a0, 1
-	li $a1, 10
+	add $a1, $0, $s5
 	jal generatemonster
 	
 	# create 10 pits
 	li $a0, 2
-	li $a1, 10
+	add $a1, $0, $s6
 	jal generatemonster
 	
 	# generate the gold
@@ -178,6 +187,12 @@ pmloop:
 	addi $sp, $sp, 4
 	lw $t0, ($sp)
 	jr $t0
+	
+wumpnado: #(a0 the index of the player, a1 the amount of wumpus, a2 the amount of pits)
+	li $a0, 0
+	li $a1, 10
+	li $a2, 10
+	j generatemap
 	
 finish:
 	li $v0, 10
