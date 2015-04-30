@@ -194,6 +194,14 @@ wumpnado: #(a0 the index of the player, a1 the amount of wumpus, a2 the amount o
 	li $a2, 10
 	j generatemap
 	
+north:
+
+south:
+
+east:
+
+west: 
+	
 finish:
 	li $v0, 10
 	syscall
