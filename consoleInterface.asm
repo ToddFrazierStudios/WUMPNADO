@@ -70,19 +70,23 @@ console_readline_and_print: pushra
 	# $a0 is the memory offset in the character buffer that we are writing to
 	
 	li $a1, 0 # $a1 is now the index into the string that the next character will be written to
-	li $t3, 0
+	li $t7, 0
 	
 	console_readline_and_print_loop:
 		#CURSOR
 		add $t1, $a0, $0
 		add $t2, $a1, $0
+		add $t3, $a2, $0
+		add $t4, $a3, $0
 		li $v0, 30
 		syscall
-		bge $a0, $t3, console_readline_and_print_togglecursor
+		bge $a0, $t7, console_readline_and_print_togglecursor
 
 		console_readline_and_print_resumeloop:
 		add $a0, $t1, $0
 		add $a1, $t2, $0
+		add $a2, $t3, $0
+		add $a3, $t4, $0
 		#END CURSOR
 		console_readchar
 		blez $v0, console_readline_and_print_loop
@@ -117,7 +121,7 @@ console_readline_and_print: pushra
 console_readline_and_print_return: return
 
 console_readline_and_print_togglecursor:
-		addi $t3, $a0, CURSOR_BLINK_RATE
+		addi $t7, $a0, CURSOR_BLINK_RATE
 		bge $t2, $a3, console_readline_and_print_printspc
 		lb $t0, CONSOLE($t1)
 		beq $t0, CURSOR_CHAR, console_readline_and_print_printspc
