@@ -30,6 +30,94 @@ screen_blank:                                    ## <-- CENTER
 .asciiz "                                                                                " #line 25
 #                                                ## <-- CENTER
 
+.globl screen_gameover_pit
+screen_gameover_pit:                             ## <-- CENTER
+.ascii  "################$$$$$$$$$$$$$**********************$$$$$$$$$$$$$################" #line 1
+.ascii  "###########$$$$$$$$$************                ************$$$$$$$$$###########"
+.ascii  "######$$$$$******                                              ******$$$$$######"
+.ascii  "###$$$***                                                              ***$$$###"
+.ascii  "##$$**                                                                    **$$##" #line 5
+.ascii  "#$*                                                                          *$#"
+.ascii  "$*                                                                            *$"
+.ascii  "*                                                                              *"
+.ascii  "                                _____----------______                           "
+.ascii  "                          _____/#####################\\______                    " #line 10
+.ascii  "                     ____/##################################\\_____              "
+.ascii  "                    /#############################################\\             "
+.ascii  "                    \\#############################################/             "
+.ascii  "                          ###################################                   "
+.ascii  "                                ######################                          " #line 15
+.ascii  "                                                                                "
+.ascii  "                                                                                "
+.ascii  "*                                                                              *"
+.ascii  "$*                                                                            *$"
+.ascii  "#$*                       You fell down a pit and died.                      *$#" #line 20
+.ascii  "##$$**                                                                    **$$##"
+.ascii  "###$$$***                                                              ***$$$###"
+.ascii  "######$$$$$******                   GAME OVER                  ******$$$$$######"
+.ascii  "###########$$$$$$$$$************                ************$$$$$$$$$###########"
+.asciiz "################$$$$$$$$$$$$$**********************$$$$$$$$$$$$$################" #line 25
+#                                                ## <-- CENTER
+
+.globl screen_gameover_eaten
+screen_gameover_eaten:                           ## <-- CENTER
+.ascii  "                                     ____                                       " #line 1
+.ascii  "                              __,---'     `--.__                                "
+.ascii  "                           ,-'                ; `.                              "
+.ascii  "                          ,'                  `--.`--.                          "
+.ascii  "                         ,'                       `._ `-.                       " #line 5
+.ascii  "                         ;                     ;     `-- ;                      "
+.ascii  "                       ,-'-_       _,-~~-.      ,--      `.                     "
+.ascii  "                       ;;   `-,;    ,'~`.__    ,;;;    ;  ;                     "
+.ascii  "                       ;;    ;,'  ,;;      `,  ;;;     `. ;                     "
+.ascii  "                       `:   ,'    `:;     __/  `.;      ; ;                     " #line 10
+.ascii  "                        ;~~^.   `.   `---'~~    ;;      ; ;                     "
+.ascii  "                        `,' `.   `.            .;;;     ;'                      "
+.ascii  "                        ,',^. `.  `._    __    `:;     ,'                       "
+.ascii  "                        `-' `--'    ~`--'~~`--.  ~    ,'                        "
+.ascii  "                       /;`-;_ ; ;. /. /   ; ~~`-.     ;                         " #line 15
+.ascii  "-._                   ; ;  ; `,;`-;__;---;      `----'                          "
+.ascii  "   `--.__             ``-`-;__;:  ;  ;__;                                       "
+.ascii  " ...     `--.__                `-- `-'                                          "
+.ascii  "`--.:::...     `--.__                ____         You were eaten by a Wumpus    "
+.ascii  "    `--:::::--.      `--.__    __,--'    `.                                     " #line 20
+.ascii  "        `--:::`;....       `--'       ___  `.                                   "
+.ascii  "            `--`-:::...     __           )  ;             GAME OVER             "
+.ascii  "                  ~`-:::...   `---.      ( ,'                                   "
+.ascii  "                      ~`-:::::::::`--.   `-.                                    "
+.asciiz "                          ~`-::::::::`.    ;                                    " #line 25
+        #                              ~`--:::,'   ,'
+        #                                   ~~`--'~
+#                                                ## <-- CENTER
+
+.globl screen_gameover_win
+screen_gameover_win:                             ## <-- CENTER
+.ascii  "                                                                                " #line 1
+.ascii  "                                                                                "
+.ascii  "                                                                                "
+.ascii  "                              You found the treasure and made your escape!      "
+.ascii  "                                                                                " #line 5
+.ascii  "                                                                                "
+.ascii  "                      _.--.                                                     "
+.ascii  "                  _.-'_:-'||                                                    "
+.ascii  "              _.-'_.-::::'||                                                    "
+.ascii  "         _.-:'_.-::::::'  ||                                                    " #line 10
+.ascii  "       .'`-.-:::::::'     ||                         YOU WIN!                   "
+.ascii  "      /.'`;|:::::::'      ||_                                                   "
+.ascii  "     ||   ||::::::'     _.;._'-._                                               "
+.ascii  "     ||   ||:::::'  _.-!oo @.!-._'-.                                            "
+.ascii  "     \\'.  ||:::::.-!()oo @!()@.-'_.|                                            " #line 15
+.ascii  "      '.'-;|:.-'.&$@.& ()$%-'o.'\\U||                                            "
+.ascii  "        `>'-.!@%()@'@_%-'_.-o _.|'||                                            "
+.ascii  "         ||-._'-.@.-'_.-' _.-o  |'||                                            "
+.ascii  "         ||=[ '-._.-\\U/.-'    o |'||                                            "
+.ascii  "         || '-.]=|| |'|      o  |'||                                            " #line 20
+.ascii  "         ||      || |'|        _| ';                                            "
+.ascii  "         ||      || |'|    _.-'_.-'                                             "
+.ascii  "         |'-._   || |'|_.-'_.-'                                                 "
+.ascii  "          '-._'-.|| |' `_.-'                                                    "
+.asciiz "              '-.||_/.-'                                                        " #line 25
+
 
 .globl screen_logo
 screen_logo: 
@@ -84,6 +172,6 @@ screen_help:                                     ## <-- CENTER
 .ascii  "                                                                                "
 .ascii  "                                                                                "
 .ascii  "                                                                                "
-.ascii  "                             Press any key to begin                             "
+.ascii  "                                                                                "
 .asciiz "                                                                                " #line 25
 #                                                ## <-- CENTER
