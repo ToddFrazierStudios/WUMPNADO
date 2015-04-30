@@ -1,5 +1,9 @@
 .include "macros.asm"
 
+.data
+.eqv CURSOR_CHAR 95
+.eqv CURSOR_BLINK_RATE 300
+
 .text
 
 #prints a string to the console starting at the given cordinates
@@ -66,8 +70,20 @@ console_readline_and_print: pushra
 	# $a0 is the memory offset in the character buffer that we are writing to
 	
 	li $a1, 0 # $a1 is now the index into the string that the next character will be written to
+	li $t3, 0
 	
 	console_readline_and_print_loop:
+		#CURSOR
+		add $t1, $a0, $0
+		add $t2, $a1, $0
+		li $v0, 30
+		syscall
+		bge $a0, $t3, console_readline_and_print_togglecursor
+
+		console_readline_and_print_resumeloop:
+		add $a0, $t1, $0
+		add $a1, $t2, $0
+		#END CURSOR
 		console_readchar
 		blez $v0, console_readline_and_print_loop
 		
@@ -85,6 +101,7 @@ console_readline_and_print: pushra
 	
 	console_readline_and_print_handlebackspace:
 		blez $a1, console_readline_and_print_loop #if we can't backspace any more
+		sb $0, CONSOLE($a0)
 		subi $a1, $a1, 1 #decrement the addresses and indexes
 		subi $a0, $a0, 1
 		sb $0, CONSOLE($a0) #clear the character in the console
@@ -98,6 +115,23 @@ console_readline_and_print: pushra
 		sb $0, ($t0)
 		# and return...
 console_readline_and_print_return: return
+
+console_readline_and_print_togglecursor:
+		addi $t3, $a0, CURSOR_BLINK_RATE
+		bge $t2, $a3, console_readline_and_print_printspc
+		lb $t0, CONSOLE($t1)
+		beq $t0, CURSOR_CHAR, console_readline_and_print_printspc
+		li $t0, CURSOR_CHAR
+		sb $t0, CONSOLE($t1)
+		j console_readline_and_print_resumeloop
+		
+		console_readline_and_print_printspc:
+		sb $0, CONSOLE($t1)
+		j console_readline_and_print_resumeloop
+
+
+
+
 
 # clears the console
 #PARAMETERS:
