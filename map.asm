@@ -1,14 +1,18 @@
 # Map creation and manipulation
-
+.include "macros.asm"
 .data
-
+.globl player
 n:	.asciiz "\n"
 map:	.word 0:64 # 0 for blank, 1 for wumpus, 2 for pit, 3 for gold, 4 for player
+player: .word 0
 
 .text 
-
 main:
-	
+	j initializemap
+
+.globl initializemap, get
+initializemap:
+	pushra
 	# Get system time to seed random number generator
 	li $v0, 30
 	syscall
@@ -20,18 +24,24 @@ main:
 	li $a0, 1
 	syscall
 	
+	sw $0, player
+	
 	li $a0, 0
 	li $a1, 10
 	li $a2, 10
-	j generatemap
+	jal generatemap
+	
+	return
 	
 # Fill the map with monsters
 generatemap: #(a0 the position of player, a1 the number of wumpus, a2 the number of pits)
 	
+	pushra
+	
 	# s0 is the map's address
 	la $s0, map
 	
-	add $s4, $0, $a0
+	lw $s4, player
 	add $s5, $0, $a1
 	add $s6, $0, $a2
 	
@@ -58,7 +68,7 @@ generatemap: #(a0 the position of player, a1 the number of wumpus, a2 the number
 	
 	jal printmap
 	
-	j finish
+	return
 	
 generatemonster: #($a0: the monster's number, $a1: the amount to place)
 	
@@ -81,21 +91,13 @@ gmloop:
 	
 	add $s3, $a0, $0
 	
-	# print index
-	li $v0, 1
-	#syscall
-	
-	# new line
-	li $v0, 4
-	la $a0, n
-	#syscall
 	
 	# store what's in the array in t2
 	jal get
 	#lw $a0, ($a0)
 	
 	# if the place in the map is not empty, try again
-	#bnez $a0, gmloop
+	bnez $a0, gmloop
 	
 	# if the array element is zero, store the monster
 	add $a1, $s1, $0
@@ -118,6 +120,11 @@ get:	#($a0: the index of the array)
 	sw $ra, ($sp)
 	subi $sp, $sp, 4
 	
+	
+	bltz $a0, outofbounds
+	li $t0, 63
+	bgt $a0, $t0, outofbounds
+	
 	add $t0, $a0, $0
 	
 	# move to the spot in the array
@@ -126,8 +133,12 @@ get:	#($a0: the index of the array)
 	
 	# a0 holds the value of that spot in the array
 	add $a0, $t0, $0
-	#lw $a0, ($t0)
+	lw $a0, ($t0)
 	
+	j getreturn
+outofbounds:
+	li $a0, 0
+getreturn:
 	# return
 	addi $sp, $sp, 4
 	lw $t0, ($sp)
@@ -135,17 +146,14 @@ get:	#($a0: the index of the array)
 
 store: #($a0: the index of the array, $a1: the value to store)
 	
-	sw $ra, ($sp)
-	subi $sp, $sp, 4
+	pushra
 	
 	mul $t0, $a0, 4
-	add $t1, $t0, $s0
+	la $t1, map
+	add $t1, $t0, $t1
 	sw $a1, ($t1)
 	
-	# return
-	addi $sp, $sp, 4
-	lw $t0, ($sp)
-	jr $t0	
+	return	
 
 # uses s4 and s5
 printmap:
@@ -164,7 +172,7 @@ pmloop:
 	li $v0, 1
 	add $a0, $s5, $0
 	jal get
-	lw $a0, ($a0)
+	#lw $a0, ($a0)
 	syscall
 	
 	li $v0, 11
@@ -183,6 +191,11 @@ pmloop:
 	li $s6, 8
 	bnez $s4, pmloop
 	
+	
+	# new line
+	li $v0, 4
+	la $a0, n
+	syscall
 	# return
 	addi $sp, $sp, 4
 	lw $t0, ($sp)
@@ -193,14 +206,93 @@ wumpnado: #(a0 the index of the player, a1 the amount of wumpus, a2 the amount o
 	li $a1, 10
 	li $a2, 10
 	j generatemap
-	
+
+.globl north, south, east, west	
 north:
+	pushra
+	lw $t2, player
+	
+	subi $t3, $t2, 8
+	bltz $t3, northreturn
+	add $a0, $0, $t2
+	li $a1, 0
+	jal store
+	add $a0, $0, $t3
+	li $a1, 4
+	jal store
+	sw $t3, player
+	
+	
+northreturn: 
+	jal printmap
+	return
+	
 
 south:
 
-east:
+	pushra
+	lw $t2, player
+	
+	addi $t3, $t2, 8
+	li $t4, 63
+	bgt $t3, $t4, southreturn
+	add $a0, $0, $t2
+	li $a1, 0
+	jal store
+	add $a0, $0, $t3
+	li $a1, 4
+	jal store
+	sw $t3, player
+	
+southreturn: 
+	jal printmap
+	return
 
-west: 
+east:
+	pushra
+	lw $t2, player
+	
+	li $t4, 8
+	addi $t5, $t2, 1
+	div $t5, $t4
+	mfhi $t5
+	beqz $t5, eastreturn
+	
+	addi $t3, $t2, 1
+	add $a0, $0, $t2
+	li $a1, 0
+	jal store
+	add $a0, $0, $t3
+	li $a1, 4
+	jal store
+	sw $t3, player
+	
+eastreturn: 
+	jal printmap
+	return
+
+west: pushra
+	lw $t2, player
+	
+	li $t4, 8
+	div $t2, $t4
+	
+	mfhi $t4
+	beqz $t4, westreturn
+	
+	subi $t3, $t2, 1
+	add $a0, $0, $t2
+	li $a1, 0
+	jal store
+	add $a0, $0, $t3
+	li $a1, 4
+	jal store
+	sw $t3, player
+	
+	
+westreturn: 
+	jal printmap
+	return
 	
 finish:
 	li $v0, 10

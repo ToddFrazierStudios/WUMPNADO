@@ -76,8 +76,6 @@ console_readline_and_print: pushra
 		#CURSOR
 		add $t1, $a0, $0
 		add $t2, $a1, $0
-		add $t3, $a2, $0
-		add $t4, $a3, $0
 		li $v0, 30
 		syscall
 		bge $a0, $t7, console_readline_and_print_togglecursor
@@ -85,8 +83,6 @@ console_readline_and_print: pushra
 		console_readline_and_print_resumeloop:
 		add $a0, $t1, $0
 		add $a1, $t2, $0
-		add $a2, $t3, $0
-		add $a3, $t4, $0
 		#END CURSOR
 		console_readchar
 		blez $v0, console_readline_and_print_loop
