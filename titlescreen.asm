@@ -11,8 +11,8 @@ entermsg: .asciiz "You step into the cave"
 dotmsg: .asciiz "."
 enterclr: .asciiz "                         "
 
-goodluckmsg: .asciiz "Good luck"
-goodluckclr: .asciiz "         "
+goodluckmsg: .asciiz "Good luck."
+goodluckclr: .asciiz "          "
 
 .text
 .globl main
@@ -41,6 +41,7 @@ main:
 	syscall
 	blez $v0, animationloop
 		
+	beq $v0, 113, finish
 	beq $v0, 104, drawhelpscreen
 	
 	j startgame	
@@ -117,6 +118,7 @@ startgame:
 	la $a2, goodluckclr
 	jal console_printstring
 	
+	j menu
 	
 	li $a0, 0
 	li $a1, 0
@@ -144,4 +146,6 @@ startgame:
 	jal console_printstring
 	
 	
+finish:
+	jal console_clear
 	END_PROGRAM

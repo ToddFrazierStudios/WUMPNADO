@@ -8,8 +8,6 @@ player: .word 0
 wcounter: .word 10
 
 .text 
-main:
-	j initializemap
 
 .globl initializemap, get, wumpnado
 initializemap:
@@ -28,9 +26,17 @@ initializemap:
 	# initialize the player's position
 	sw $0, player
 	
+	li $t4, 63
+	clearloop:
+	addi $a0, $t4, 0
+	li $a1, 0
+	jal store
+	subi $t4, $t4, 1
+	bgez $t4, clearloop
+	
 	li $a0, 0  # player position
-	li $a1, 10 # number of wumpus
-	li $a2, 10 # number of pits
+	li $a1, 7 # number of wumpus
+	li $a2, 7 # number of pits
 	jal generatemap
 	
 	return
@@ -46,7 +52,7 @@ generatemap: #(a0 the position of player, a1 the number of wumpus, a2 the number
 	li $a1, 10
 	syscall
 	
-	addi $a0, $a0, 1
+	addi $a0, $a0, 5
 	sw $a0, wcounter
 	
 	# s0 is the map's address
@@ -218,16 +224,16 @@ wumpnado: #(a0 the index of the player, a1 the amount of wumpus, a2 the amount o
 	
 	# clear the map
 	li $t4, 63
-clearloop:
+clearloop2:
 	addi $a0, $t4, 0
 	li $a1, 0
 	jal store
 	subi $t4, $t4, 1
-	bgez $t4, clearloop
+	bgez $t4, clearloop2
 	
 	li $a0, 0
-	li $a1, 10
-	li $a2, 10
+	li $a1, 7
+	li $a2, 7
 	jal generatemap
 	return
 

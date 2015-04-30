@@ -1,7 +1,7 @@
 .include "macros.asm"
 
 .data
-.globl choice, northtext, southtext, westtext, easttext
+.globl choice, northtext, southtext, westtext, easttext, menu
 
 choice: .asciiz "North"
 
@@ -51,6 +51,8 @@ wumpnadotext:
 menu:
 	
 	jal initializemap
+	li $s6, 0
+	sw $s6, line
 	
 menuloop:
 
@@ -189,7 +191,7 @@ analyzechoice:
 	jal comparestr
 	
 	
-	beqz $v0, finish
+	beqz $v0, main
 	
 	return
 	
@@ -323,31 +325,37 @@ analyzereturn:
 
 .globl hitwumpus, fellpit, foundgold	
 hitwumpus:
-	lw $a0, line
-	addi $s6, $a0, 1
+	li $a0, 0
 	li $a1, 0
-	la $a2, wdeath
+	la $a2, screen_gameover_eaten
 	jal console_printstring
-	sw $s6, line
-	j finish
+	waitforinput1:
+	li $v0, 100
+	syscall
+	blez $v0, waitforinput1
+	j main
 
 fellpit:
-	lw $a0, line
-	addi $s6, $a0, 1
+	li $a0, 0
 	li $a1, 0
-	la $a2, pdeath
+	la $a2, screen_gameover_pit
 	jal console_printstring
-	sw $s6, line
-	j finish
+	waitforinput2:
+	li $v0, 100
+	syscall
+	blez $v0, waitforinput2
+	j main
 
 foundgold:
-	lw $a0, line
-	addi $s6, $a0, 1
+	li $a0, 0
 	li $a1, 0
-	la $a2, gdeath
+	la $a2, screen_gameover_win
 	jal console_printstring
-	sw $s6, line
-	j finish
+	waitforinput3:
+	li $v0, 100
+	syscall
+	blez $v0, waitforinput3
+	j main
 	
 wincoming:
 
