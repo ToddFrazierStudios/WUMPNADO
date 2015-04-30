@@ -41,7 +41,7 @@ main:
 	syscall
 	blez $v0, animationloop
 		
-	beq $v0, 113, finish
+	#beq $v0, 113, finish
 	beq $v0, 104, drawhelpscreen
 	
 	j startgame	

@@ -145,7 +145,7 @@ screen_logo:
 .ascii  "                                                                                "
 .ascii  "                                                                                "
 .ascii  "                                                                                "
-.asciiz " Press q to quit                                        Press h for how to play " #line 25
+.asciiz "                                                        Press h for how to play " #line 25
 
 .globl screen_help
 screen_help:                                     ## <-- CENTER

@@ -26,6 +26,7 @@ initializemap:
 	# initialize the player's position
 	sw $0, player
 	
+	# clear the board
 	li $t4, 63
 	clearloop:
 	addi $a0, $t4, 0
@@ -62,7 +63,7 @@ generatemap: #(a0 the position of player, a1 the number of wumpus, a2 the number
 	add $s5, $0, $a1
 	add $s6, $0, $a2
 	
-	# place player in room 0
+	# place player
 	li $t2, 4
 	mul $t1, $s4, 4
 	add $t1, $t1, $s0
@@ -190,9 +191,9 @@ pmloop:
 	li $v0, 1
 	add $a0, $s5, $0
 	jal get
-	#lw $a0, ($a0)
 	syscall
 	
+	# print a space
 	li $v0, 11
 	li $a0, 32
 	syscall
