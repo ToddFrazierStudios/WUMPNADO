@@ -1,12 +1,13 @@
 .eqv CONSOLE 0x10020000
+.eqv CONSOLE_CHARS_PER_ROW 80
 
 .macro push (%r)
 	sw %r, ($sp)
 	subi $sp, $sp, 4
 .end_macro
 
-.macro pushsp
-	push $sp
+.macro pushra
+	push $ra
 .end_macro
 
 .macro pop (%r)
