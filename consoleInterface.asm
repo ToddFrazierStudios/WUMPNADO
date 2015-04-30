@@ -143,11 +143,13 @@ console_clear: pushra
 	li $t0, 0 # $t0 will be our index into the buffer
 	
 	console_clear_loop:
-		sb $0, CONSOLE($t0)
-		addi $t0, $t0, 1
+		sw $0, CONSOLE($t0)
+		addi $t0, $t0, 4
 		blt $t0, CONSOLE_BUFFER_SIZE, console_clear_loop
 		
 	return
+	
+
 	
 # prints a signed integer to the console
 #PARAMETERS:
