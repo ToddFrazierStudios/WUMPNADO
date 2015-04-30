@@ -98,5 +98,21 @@ console_readline_and_print: pushra
 		sb $0, ($t0)
 		# and return...
 console_readline_and_print_return: return
+
+# clears the console
+#PARAMETERS:
+# (none)
+#DESTROYED:
+# $t0
+.globl console_clear
+console_clear: pushra
+	li $t0, 0 # $t0 will be our index into the buffer
+	
+	console_clear_loop:
+		sb $0, CONSOLE($t0)
+		addi $t0, $t0, 1
+		blt $t0, CONSOLE_BUFFER_SIZE, console_clear_loop
+		
+	return
 	
 	

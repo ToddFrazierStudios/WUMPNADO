@@ -5,8 +5,8 @@ string: .asciiz "This is a test string! wooo! \n let's see what a newline does!"
 request: .asciiz "Enter a string: "
 .text
 
-.globl main
-main:
+.globl main2
+main2:
 	li $a0, 0
 	li $a1, 0
 	la $a2, string
