@@ -29,6 +29,9 @@ wumpus:
 pit:
 .asciiz "You feel a breeze."
 
+gold:
+.asciiz "You see something shiny."
+
 room:
 .asciiz "You are now in room "
 
@@ -38,7 +41,10 @@ wdeath:
 pdeath:
 .asciiz "You fell into a pit."
 
-wumpnado:
+gdeath:
+.asciiz "You found the gold!"
+
+wumpnadotext:
 .asciiz "Wumpnado incoming!"
 .text
 
@@ -47,6 +53,25 @@ menu:
 	jal initializemap
 	
 menuloop:
+
+	lw $t0, wcounter
+	
+	# print the countdown
+	li $v0, 1
+	addi $a0, $t0, 0
+	syscall
+	# new line
+	li $v0, 4
+	la $a0, n
+	syscall
+	
+	bnez $t0, loop
+	jal wumpnado
+
+loop:
+	lw $t0, wcounter
+	subi $t0, $t0, 1
+	sw $t0, wcounter
 	lw $a0, line
 	addi $s6, $a0, 0
 	li $a1, 0
@@ -127,6 +152,9 @@ menuloop:
 	
 	li $s6, 0
 	sw $s6, line
+	li $t0, 1
+	lw $t1, wcounter
+	beq $t0, $t1, wincoming
 	j menuloop
 	
 analyzechoice:
@@ -166,7 +194,7 @@ analyzechoice:
 	return
 	
 movenorth:
-
+	
 	jal north
 	return
 	
@@ -186,6 +214,8 @@ analyzeenv:
 	pushra
 	jal checknorth
 	jal checksouth
+	jal checkeast
+	jal checkwest
 	j analyzereturn
 	
 checknorth:
@@ -199,6 +229,7 @@ checknorth:
 	li $t2, 3
 	beq $a0, $t0, nearwumpus
 	beq $a0, $t1, nearpit
+	beq $a0, $t2, neargold
 	return
 	
 checksouth:
@@ -212,12 +243,20 @@ checksouth:
 	li $t2, 3
 	beq $a0, $t0, nearwumpus
 	beq $a0, $t1, nearpit
+	beq $a0, $t2, neargold
 	return
 	
-checkwest:
+checkeast:
 	pushra
+	
 	lw $t3, player
-	addi $a0, $t3, 8
+	li $t4, 8
+	addi $t5, $t3, 1
+	add $a0, $t5, $0
+	div $t5, $t4
+	mfhi $t5
+	beqz $t5, checkeastreturn
+	
 	jal get
 	
 	li $t0, 1
@@ -225,6 +264,31 @@ checkwest:
 	li $t2, 3
 	beq $a0, $t0, nearwumpus
 	beq $a0, $t1, nearpit
+	beq $a0, $t2, neargold
+	
+checkeastreturn:
+	return
+	
+checkwest:
+	pushra
+	
+	lw $t3, player
+	li $t4, 8
+	subi $a0, $t3, 1
+	div $t3, $t4
+	mfhi $t3
+	beqz $t3, checkwestreturn
+	
+	jal get
+	
+	li $t0, 1
+	li $t1, 2
+	li $t2, 3
+	beq $a0, $t0, nearwumpus
+	beq $a0, $t1, nearpit
+	beq $a0, $t2, neargold
+	
+checkwestreturn:
 	return
 	
 nearwumpus:
@@ -245,7 +309,55 @@ nearpit:
 	sw $s6, line
 	j analyzereturn
 	
+neargold:
+	lw $a0, line
+	addi $s6, $a0, 1
+	li $a1, 0
+	la $a2, gold
+	jal console_printstring
+	sw $s6, line
+	j analyzereturn
+	
 analyzereturn:
 	return
+
+.globl hitwumpus, fellpit, foundgold	
+hitwumpus:
+	lw $a0, line
+	addi $s6, $a0, 1
+	li $a1, 0
+	la $a2, wdeath
+	jal console_printstring
+	sw $s6, line
+	j finish
+
+fellpit:
+	lw $a0, line
+	addi $s6, $a0, 1
+	li $a1, 0
+	la $a2, pdeath
+	jal console_printstring
+	sw $s6, line
+	j finish
+
+foundgold:
+	lw $a0, line
+	addi $s6, $a0, 1
+	li $a1, 0
+	la $a2, gdeath
+	jal console_printstring
+	sw $s6, line
+	j finish
+	
+wincoming:
+
+	lw $a0, line
+	addi $s6, $a0, 1
+	li $a1, 0
+	la $a2, wumpnadotext
+	jal console_printstring
+	sw $s6, line
+	j menuloop
+
 finish:
 	END_PROGRAM

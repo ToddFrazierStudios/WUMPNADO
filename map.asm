@@ -1,16 +1,17 @@
 # Map creation and manipulation
 .include "macros.asm"
 .data
-.globl player
+.globl player, wcounter, n
 n:	.asciiz "\n"
 map:	.word 0:64 # 0 for blank, 1 for wumpus, 2 for pit, 3 for gold, 4 for player
 player: .word 0
+wcounter: .word 10
 
 .text 
 main:
 	j initializemap
 
-.globl initializemap, get
+.globl initializemap, get, wumpnado
 initializemap:
 	pushra
 	# Get system time to seed random number generator
@@ -24,11 +25,12 @@ initializemap:
 	li $a0, 1
 	syscall
 	
+	# initialize the player's position
 	sw $0, player
 	
-	li $a0, 0
-	li $a1, 10
-	li $a2, 10
+	li $a0, 0  # player position
+	li $a1, 10 # number of wumpus
+	li $a2, 10 # number of pits
 	jal generatemap
 	
 	return
@@ -37,6 +39,15 @@ initializemap:
 generatemap: #(a0 the position of player, a1 the number of wumpus, a2 the number of pits)
 	
 	pushra
+	
+	# get a random number for the wumpnado countdown
+	li $v0, 42
+	li $a0, 1
+	li $a1, 10
+	syscall
+	
+	addi $a0, $a0, 1
+	sw $a0, wcounter
 	
 	# s0 is the map's address
 	la $s0, map
@@ -69,7 +80,8 @@ generatemap: #(a0 the position of player, a1 the number of wumpus, a2 the number
 	jal printmap
 	
 	return
-	
+
+
 generatemonster: #($a0: the monster's number, $a1: the amount to place)
 	
 	sw $ra, ($sp)
@@ -202,10 +214,22 @@ pmloop:
 	jr $t0
 	
 wumpnado: #(a0 the index of the player, a1 the amount of wumpus, a2 the amount of pits)
+	pushra
+	
+	# clear the map
+	li $t4, 63
+clearloop:
+	addi $a0, $t4, 0
+	li $a1, 0
+	jal store
+	subi $t4, $t4, 1
+	bgez $t4, clearloop
+	
 	li $a0, 0
 	li $a1, 10
 	li $a2, 10
-	j generatemap
+	jal generatemap
+	return
 
 .globl north, south, east, west	
 north:
@@ -217,6 +241,14 @@ north:
 	add $a0, $0, $t2
 	li $a1, 0
 	jal store
+	add $a0, $0, $t3
+	jal get
+	li $t4, 1
+	li $t5, 2
+	li $t6, 3
+	beq $a0, $t4, hitwumpus
+	beq $a0, $t5, fellpit
+	beq $a0, $t6, foundgold
 	add $a0, $0, $t3
 	li $a1, 4
 	jal store
@@ -239,6 +271,14 @@ south:
 	add $a0, $0, $t2
 	li $a1, 0
 	jal store
+	add $a0, $0, $t3
+	jal get
+	li $t4, 1
+	li $t5, 2
+	li $t6, 3
+	beq $a0, $t4, hitwumpus
+	beq $a0, $t5, fellpit
+	beq $a0, $t6, foundgold
 	add $a0, $0, $t3
 	li $a1, 4
 	jal store
@@ -263,6 +303,14 @@ east:
 	li $a1, 0
 	jal store
 	add $a0, $0, $t3
+	jal get
+	li $t4, 1
+	li $t5, 2
+	li $t6, 3
+	beq $a0, $t4, hitwumpus
+	beq $a0, $t5, fellpit
+	beq $a0, $t6, foundgold
+	add $a0, $0, $t3
 	li $a1, 4
 	jal store
 	sw $t3, player
@@ -284,6 +332,14 @@ west: pushra
 	add $a0, $0, $t2
 	li $a1, 0
 	jal store
+	add $a0, $0, $t3
+	jal get
+	li $t4, 1
+	li $t5, 2
+	li $t6, 3
+	beq $a0, $t4, hitwumpus
+	beq $a0, $t5, fellpit
+	beq $a0, $t6, foundgold
 	add $a0, $0, $t3
 	li $a1, 4
 	jal store
