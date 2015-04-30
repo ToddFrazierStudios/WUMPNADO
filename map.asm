@@ -35,7 +35,6 @@ initializemap:
 	subi $t4, $t4, 1
 	bgez $t4, clearloop
 	
-	li $a0, 0  # player position
 	li $a1, 7 # number of wumpus
 	li $a2, 7 # number of pits
 	jal generatemap
@@ -43,9 +42,13 @@ initializemap:
 	return
 	
 # Fill the map with monsters
-generatemap: #(a0 the position of player, a1 the number of wumpus, a2 the number of pits)
+generatemap: #(a1 the number of wumpus, a2 the number of pits)
 	
 	pushra
+	
+	
+	add $s5, $0, $a1
+	add $s6, $0, $a2
 	
 	# get a random number for the wumpnado countdown
 	li $v0, 42
@@ -60,8 +63,6 @@ generatemap: #(a0 the position of player, a1 the number of wumpus, a2 the number
 	la $s0, map
 	
 	lw $s4, player
-	add $s5, $0, $a1
-	add $s6, $0, $a2
 	
 	# place player
 	li $t2, 4
@@ -105,7 +106,7 @@ gmloop:
 	# get a random spot for the monster between 0 and 64
 	li $v0, 42
 	li $a0, 1
-	li $a1, 65
+	li $a1, 64
 	syscall
 	
 	add $s3, $a0, $0
